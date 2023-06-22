@@ -3,6 +3,6 @@ export interface TransactionData {
   amount: number;
   date: Date;
   source: string;
-  insertedAt: string;
+  insertedAt?: string;
   updatedAt: string;
 }

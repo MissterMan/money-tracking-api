@@ -2,7 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import {
   createTransaction,
+  deleteTransaction,
   getAllTransaction,
+  updateTransaction,
 } from "../repositories/repository";
 import { TransactionData } from "../models/transactionData";
 
@@ -53,6 +55,54 @@ export const createTransactionController = async (
     res.json({ message: "Transaction Created", result });
   } catch (error) {
     console.error("Error creating transacion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const updateTransactionController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { uuid } = req.params;
+    const { amount, date, source } = req.body;
+
+    if (!amount || !date || !source) {
+      res.json({ message: "All data required" });
+    }
+
+    const updatedAt: string = new Date()
+      .toJSON()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    const updatedTransaction: TransactionData = {
+      uuid,
+      amount,
+      date,
+      source,
+      updatedAt,
+    };
+
+    const result: object = await updateTransaction(updatedTransaction);
+    res.json(result);
+  } catch (error) {
+    console.error("Error creating transacion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const deleteTransactionController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { uuid } = req.params;
+
+    const result: object = await deleteTransaction(uuid);
+    res.json(result);
+  } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

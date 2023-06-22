@@ -1,4 +1,4 @@
-import mysql, { Connection, MysqlError } from "mysql";
+import mysql, { MysqlError } from "mysql";
 import dotenv from "dotenv";
 import { PoolConnection } from "mysql";
 

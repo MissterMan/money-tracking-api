@@ -30,8 +30,8 @@ export const getAllTransaction = (): Promise<object> => {
   });
 };
 
-export const createTransaction = (data: TransactionData): Promise<any> => {
-  return new Promise((resolve, reject) => {
+export const createTransaction = (data: TransactionData): Promise<object> => {
+  return new Promise<object>((resolve, reject) => {
     db_pool.getConnection((err: MysqlError, conn: PoolConnection) => {
       if (err) {
         console.error(err);
@@ -52,7 +52,64 @@ export const createTransaction = (data: TransactionData): Promise<any> => {
           data.insertedAt,
           data.updatedAt,
         ],
-        (error: MysqlError | null, results: object[]) => {
+        (error: MysqlError | null, results: object) => {
+          conn.release();
+          if (error) {
+            console.error(error);
+            reject(error);
+            return;
+          }
+          resolve(results);
+        }
+      );
+    });
+  });
+};
+
+export const updateTransaction = (data: TransactionData): Promise<object> => {
+  return new Promise<object>((resolve, reject) => {
+    db_pool.getConnection((err: MysqlError, conn: PoolConnection) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+        return;
+      }
+
+      const db_query =
+        "UPDATE transactions SET amount = ?, date = ?, source = ?, updatedAt = ? WHERE uuid = ?";
+
+      conn.query(
+        db_query,
+        [data.amount, data.date, data.source, data.updatedAt, data.uuid],
+        (error: MysqlError | null, results: object) => {
+          conn.release();
+          if (error) {
+            console.error(error);
+            reject(error);
+            return;
+          }
+          resolve(results);
+        }
+      );
+    });
+  });
+};
+
+export const deleteTransaction = (uuid: string): Promise<object> => {
+  return new Promise<object>((resolve, reject) => {
+    db_pool.getConnection((err: MysqlError, conn: PoolConnection) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+        return;
+      }
+
+      const db_query = "DELETE FROM transactions WHERE uuid = ?";
+
+      conn.query(
+        db_query,
+        [uuid],
+        (error: MysqlError | null, results: object) => {
           conn.release();
           if (error) {
             console.error(error);
